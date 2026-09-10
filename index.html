@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kum Yerine Koyma Deneyi — MKC 1004</title>
+<style>
+  :root{
+    --ink:#151A1F;
+    --ink-soft:#5C6670;
+    --paper:#FFFFFF;
+    --field:#E4E7EA;
+    --line:#C8CDD2;
+    --marker:#005E7C;
+    --sand:#C9A227;
+    --sand-bg:#FBF3D6;
+    --pass:#1B7F3B;
+    --fail:#B3261E;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--field);
+    color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    font-size:16px;
+    line-height:1.45;
+    padding:0 0 132px;
+  }
+  .wrap{max-width:560px;margin:0 auto;padding:14px 14px 0}
+
+  header{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:14px 16px;
+  }
+  header h1{
+    margin:0;
+    font-size:19px;
+    font-weight:650;
+    letter-spacing:-.01em;
+  }
+  header p{
+    margin:3px 0 0;
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+
+  section{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    margin-top:12px;
+    overflow:hidden;
+  }
+  .head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:10px;
+    padding:11px 16px;
+    border-bottom:1px solid var(--line);
+  }
+  .head h2{margin:0;font-size:14px;font-weight:650}
+  .head span{font-size:12px;color:var(--ink-soft)}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line)}
+  .cell{background:var(--paper);padding:9px 12px}
+  .cell.full{grid-column:1 / -1}
+  label{display:block;font-size:12px;color:var(--ink-soft);margin-bottom:2px}
+  label b{font-weight:650;color:var(--ink)}
+  input{
+    width:100%;
+    border:0;
+    padding:2px 0;
+    font:inherit;
+    font-size:19px;
+    font-weight:600;
+    font-variant-numeric:tabular-nums;
+    background:transparent;
+    color:var(--ink);
+    border-bottom:2px solid transparent;
+  }
+  input::placeholder{color:#AFB6BC;font-weight:400}
+  input:focus{outline:none;border-bottom-color:var(--marker)}
+
+  /* sabitler */
+  .const .cell{background:var(--sand-bg)}
+  .const .head{background:var(--sand-bg)}
+  .const input{font-size:17px}
+  .const input:focus{border-bottom-color:var(--sand)}
+
+  /* ara sonuclar */
+  .out{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line)}
+  .o{background:var(--paper);padding:9px 12px}
+  .o .k{font-size:12px;color:var(--ink-soft)}
+  .o .v{font-size:18px;font-weight:600;font-variant-numeric:tabular-nums}
+  .o .v.empty{color:#AFB6BC;font-weight:400}
+
+  /* sonuc seridi */
+  .bar{
+    position:fixed;left:0;right:0;bottom:0;
+    background:var(--ink);
+    color:#fff;
+    padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+    border-top:3px solid var(--marker);
+  }
+  .bar .inner{max-width:560px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:14px}
+  .bar .k{font-size:12px;opacity:.75}
+  .bar .cr{font-size:38px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+  .bar .cr small{font-size:18px;font-weight:500;opacity:.7;margin-left:2px}
+  .bar .gd{font-size:13px;opacity:.75;margin-top:3px}
+  .stat{
+    padding:8px 14px;border-radius:999px;font-size:14px;font-weight:650;white-space:nowrap;
+    background:#2C333A;color:#C8CDD2;
+  }
+  .stat.pass{background:var(--pass);color:#fff}
+  .stat.fail{background:var(--fail);color:#fff}
+
+  .reset{
+    display:block;width:100%;margin:14px 0 0;
+    padding:12px;border:1px solid var(--line);border-radius:var(--radius);
+    background:var(--paper);color:var(--ink-soft);font:inherit;font-size:14px;
+  }
+  .reset:active{background:var(--field)}
+  .note{font-size:12px;color:var(--ink-soft);padding:10px 16px 12px;border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>Kum Yerine Koyma Deneyi</h1>
+    <p>Kum konisi yöntemi · yerinde sıkışma oranı</p>
+  </header>
+
+  <section class="const">
+    <div class="head"><h2>Sabitler</h2><span>kalibrasyon · gerekirse değiştir</span></div>
+    <div class="grid">
+      <div class="cell">
+        <label>Konideki kum, <b>C</b> (g)</label>
+        <input id="C" type="text" inputmode="decimal" value="1660">
+      </div>
+      <div class="cell">
+        <label>Kum birim ağırlığı, <b>Ds</b> (g/cm³)</label>
+        <input id="Ds" type="text" inputmode="decimal" value="1.423">
+      </div>
+      <div class="cell">
+        <label>Hedef kuru yoğunluk, <b>PR</b> (g/cm³)</label>
+        <input id="PR" type="text" inputmode="decimal" value="2.301">
+      </div>
+      <div class="cell">
+        <label>Min. sıkışma oranı (%)</label>
+        <input id="MIN" type="text" inputmode="decimal" value="98">
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="head"><h2>Çukur hacmi</h2><span>kum kabı</span></div>
+    <div class="grid">
+      <div class="cell">
+        <label>Kum, dökmeden önce <b>S₁</b> (g)</label>
+        <input id="S1" type="text" inputmode="decimal" placeholder="0">
+      </div>
+      <div class="cell">
+        <label>Kum, döktükten sonra <b>S₂</b> (g)</label>
+        <input id="S2" type="text" inputmode="decimal" placeholder="0">
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="head"><h2>Çukurdan çıkan numune</h2><span>yaş ağırlık</span></div>
+    <div class="grid">
+      <div class="cell">
+        <label>Numune + kap, <b>w</b> (g)</label>
+        <input id="w" type="text" inputmode="decimal" placeholder="0">
+      </div>
+      <div class="cell">
+        <label>Kabın darası, <b>t</b> (g)</label>
+        <input id="t" type="text" inputmode="decimal" placeholder="0">
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="head"><h2>Su muhtevası</h2><span>etüv</span></div>
+    <div class="grid">
+      <div class="cell">
+        <label>Boş kap, <b>E</b> (g)</label>
+        <input id="E" type="text" inputmode="decimal" placeholder="0">
+      </div>
+      <div class="cell">
+        <label>Kap + yaş zemin, <b>F</b> (g)</label>
+        <input id="F" type="text" inputmode="decimal" placeholder="0">
+      </div>
+      <div class="cell full">
+        <label>Kap + kuru zemin, <b>G</b> (g)</label>
+        <input id="G" type="text" inputmode="decimal" placeholder="0">
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="head"><h2>Ara sonuçlar</h2><span>otomatik</span></div>
+    <div class="out">
+      <div class="o"><div class="k">Çukura giden kum, S (g)</div><div class="v empty" id="oS">—</div></div>
+      <div class="o"><div class="k">Net kum, U (g)</div><div class="v empty" id="oU">—</div></div>
+      <div class="o"><div class="k">Çukur hacmi, V (cm³)</div><div class="v empty" id="oV">—</div></div>
+      <div class="o"><div class="k">Net yaş numune, W (g)</div><div class="v empty" id="oW">—</div></div>
+      <div class="o"><div class="k">Yaş yoğunluk, gw (g/cm³)</div><div class="v empty" id="ogw">—</div></div>
+      <div class="o"><div class="k">Su muhtevası, w (%)</div><div class="v empty" id="ow">—</div></div>
+    </div>
+    <div class="note">Sonuçlar formdaki 3, 5, 7, 10, 11, 15 ve 16. satırlara birebir yazılır.</div>
+  </section>
+
+  <button class="reset" id="reset">Alanları temizle</button>
+</div>
+
+<div class="bar">
+  <div class="inner">
+    <div>
+      <div class="k">Sıkışma oranı, Cr</div>
+      <div class="cr" id="cr">—<small>%</small></div>
+      <div class="gd" id="gd">Kuru yoğunluk gd —</div>
+    </div>
+    <div class="stat" id="stat">Veri bekleniyor</div>
+  </div>
+</div>
+
+<script>
+  var ids = ["C","Ds","PR","MIN","S1","S2","w","t","E","F","G"];
+  var el = {};
+  ids.forEach(function(k){ el[k] = document.getElementById(k); });
+
+  function num(k){
+    var v = (el[k].value || "").replace(",", ".").trim();
+    if (v === "") return null;
+    var n = parseFloat(v);
+    return isFinite(n) ? n : null;
+  }
+  function put(id, val, dec){
+    var e = document.getElementById(id);
+    if (val === null || !isFinite(val)) { e.textContent = "—"; e.className = "v empty"; return; }
+    e.textContent = val.toFixed(dec);
+    e.className = "v";
+  }
+
+  function calc(){
+    var C=num("C"), Ds=num("Ds"), PR=num("PR"), MIN=num("MIN");
+    var S1=num("S1"), S2=num("S2"), w=num("w"), t=num("t");
+    var E=num("E"), F=num("F"), G=num("G");
+
+    var S = (S1!==null && S2!==null) ? S1 - S2 : null;
+    var U = (S!==null && C!==null) ? S - C : null;
+    var V = (U!==null && Ds) ? U / Ds : null;
+    var W = (w!==null && t!==null) ? w - t : null;
+    var gw = (W!==null && V) ? W / V : null;
+    var wc = (E!==null && F!==null && G!==null && (G-E)!==0) ? ((F-G)/(G-E))*100 : null;
+    var gd = (gw!==null && wc!==null) ? gw*100/(100+wc) : null;
+    var Cr = (gd!==null && PR) ? gd/PR*100 : null;
+
+    put("oS", S, 0); put("oU", U, 0); put("oV", V, 0);
+    put("oW", W, 0); put("ogw", gw, 3); put("ow", wc, 1);
+
+    var crEl = document.getElementById("cr");
+    var gdEl = document.getElementById("gd");
+    var st = document.getElementById("stat");
+
+    if (Cr !== null && isFinite(Cr)) {
+      crEl.innerHTML = Cr.toFixed(1) + '<small>%</small>';
+      gdEl.textContent = "Kuru yoğunluk gd " + gd.toFixed(3) + " g/cm³";
+      if (MIN !== null) {
+        var ok = Cr >= MIN;
+        st.textContent = ok ? "Uygun" : "Uygun değil";
+        st.className = "stat " + (ok ? "pass" : "fail");
+      } else {
+        st.textContent = "Limit girilmedi";
+        st.className = "stat";
+      }
+    } else {
+      crEl.innerHTML = '—<small>%</small>';
+      gdEl.textContent = "Kuru yoğunluk gd —";
+      st.textContent = "Veri bekleniyor";
+      st.className = "stat";
+    }
+  }
+
+  ids.forEach(function(k){ el[k].addEventListener("input", calc); });
+
+  document.getElementById("reset").addEventListener("click", function(){
+    ["S1","S2","w","t","E","F","G"].forEach(function(k){ el[k].value = ""; });
+    el.S1.focus();
+    calc();
+  });
+
+  calc();
+</script>
+</body>
+</html>
